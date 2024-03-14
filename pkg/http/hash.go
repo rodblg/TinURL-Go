@@ -1,4 +1,9 @@
-package hash
+package http
+
+import (
+	"bytes"
+	"fmt"
+)
 
 type Node struct {
 	Key   string
@@ -61,4 +66,39 @@ func (h *HashMap) Insert(key string, value string) {
 			Value: value,
 		}
 	}
+}
+
+func (h *HashMap) Get(key string) (string, bool) {
+	index := getIndex(key)
+	if h.Data[index] != nil {
+		//check if another value is chained
+		starting_node := h.Data[index]
+		for ; ; starting_node = starting_node.Next {
+			if starting_node.Key == key {
+				//key matched
+				return starting_node.Value, true
+			}
+			if starting_node.Next == nil {
+				break
+			}
+		}
+	}
+
+	return "", false
+}
+
+func (h *HashMap) String() string {
+	var output bytes.Buffer
+	fmt.Println(&output, "{")
+	for _, n := range h.Data {
+		if n != nil {
+			fmt.Fprintf(&output, "\t%s: %s\n", n.Key, n.Value)
+			for node := n.Next; node != nil; node = node.Next {
+				fmt.Fprintf(&output, "\t%s: %s\n", node.Key, node.Value)
+			}
+		}
+	}
+	fmt.Fprintln(&output, "}")
+
+	return output.String()
 }

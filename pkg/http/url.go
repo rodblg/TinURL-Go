@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	HashMap "github.com/rodblg/TinURL-Go/pkg/hash"
 )
 
 type Url struct {
@@ -26,7 +25,18 @@ func (c *Url) Routes() chi.Router {
 
 func (c *Url) GetTinyUrl(w http.ResponseWriter, r *http.Request) {
 
-	a := HashMap.NewMap()
+	a := NewMap()
+	a.Insert("name", "ishan")
+	a.Insert("gender", "male")
+	a.Insert("city", "mumbai")
+	a.Insert("lastname", "khare")
+
+	if value, ok := a.Get("name"); ok {
+		log.Println(value)
+	} else {
+		log.Println("value did not match")
+	}
+
 	log.Print(a)
 
 	//GET ORIGINAL URL AS STRING

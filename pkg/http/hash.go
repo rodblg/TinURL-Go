@@ -1,10 +1,11 @@
 package http
 
 import (
-	"bytes"
-	"fmt"
+	"crypto/sha256"
+	"encoding/base64"
 )
 
+/*
 type Node struct {
 	Key   string
 	Value string
@@ -44,7 +45,7 @@ func getIndex(key string) (index int) {
 
 func (h *HashMap) Insert(key string, value string) {
 	index := getIndex(key)
-
+	fmt.Println(hash(key))
 	if h.Data[index] == nil {
 		//index is empty, then you insert the new one
 		h.Data[index] = &Node{
@@ -86,19 +87,30 @@ func (h *HashMap) Get(key string) (string, bool) {
 
 	return "", false
 }
+*/
 
-func (h *HashMap) String() string {
-	var output bytes.Buffer
-	fmt.Println(&output, "{")
-	for _, n := range h.Data {
-		if n != nil {
-			fmt.Fprintf(&output, "\t%s: %s\n", n.Key, n.Value)
-			for node := n.Next; node != nil; node = node.Next {
-				fmt.Fprintf(&output, "\t%s: %s\n", node.Key, node.Value)
-			}
-		}
+func HashURL(url string) string {
+	// Calculate SHA-256 hash of the URL
+	hash := sha256.New()
+	hash.Write([]byte(url))
+	hashBytes := hash.Sum(nil)
+
+	// Use base64 encoding to get alphanumeric characters
+	encoded := base64.URLEncoding.EncodeToString(hashBytes)
+
+	// Trim padding characters
+	trimmed := trimPadding(encoded)
+
+	// Take first 4 characters
+	shortHash := trimmed[:4]
+
+	return shortHash
+}
+
+func trimPadding(s string) string {
+	// Remove padding characters from the end of the string
+	for len(s) > 0 && s[len(s)-1] == '=' {
+		s = s[:len(s)-1]
 	}
-	fmt.Fprintln(&output, "}")
-
-	return output.String()
+	return s
 }
